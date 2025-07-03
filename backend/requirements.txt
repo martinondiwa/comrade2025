@@ -1,4 +1,4 @@
-ore Flask
+#core Flask
 Flask==2.3.2
 Flask-SQLAlchemy==3.1.1
 Flask-Migrate==4.0.4
