@@ -13,7 +13,7 @@ from app.services.post_service import get_post_by_id
 comments_bp = Blueprint("comments", __name__, url_prefix="/api/v1/comments")
 
 
-# ✅ Create a comment on a post
+#  Create a comment on a post
 @comments_bp.route("/<int:post_id>", methods=["POST"])
 @jwt_required()
 def post_comment(post_id):
@@ -44,7 +44,7 @@ def post_comment(post_id):
     }), 201
 
 
-# ✅ Get all comments on a post
+# Get all comments on a post
 @comments_bp.route("/post/<int:post_id>", methods=["GET"])
 @jwt_required()
 def get_comments(post_id):
@@ -66,7 +66,7 @@ def get_comments(post_id):
     ]), 200
 
 
-# ✅ Update own comment
+# Update own comment
 @comments_bp.route("/<int:comment_id>", methods=["PUT"])
 @jwt_required()
 def update_user_comment(comment_id):
@@ -97,7 +97,7 @@ def update_user_comment(comment_id):
     }), 200
 
 
-# ✅ Delete comment (admin or owner)
+# Delete comment (admin or owner)
 @comments_bp.route("/<int:comment_id>", methods=["DELETE"])
 @jwt_required()
 def delete_user_comment(comment_id):
