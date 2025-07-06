@@ -12,7 +12,7 @@ from app.services.user_service import get_user_by_id
 events_bp = Blueprint("events", __name__, url_prefix="/api/v1/events")
 
 
-# ✅ Get all events
+#  Get all events
 @events_bp.route("/", methods=["GET"])
 @jwt_required()
 def list_events():
@@ -31,7 +31,7 @@ def list_events():
     ]), 200
 
 
-# ✅ Get a specific event
+# Get a specific event
 @events_bp.route("/<int:event_id>", methods=["GET"])
 @jwt_required()
 def get_event(event_id):
@@ -50,7 +50,7 @@ def get_event(event_id):
     }), 200
 
 
-# ✅ Create a new event
+#  Create a new event
 @events_bp.route("/", methods=["POST"])
 @jwt_required()
 def create_new_event():
@@ -79,7 +79,7 @@ def create_new_event():
     }), 201
 
 
-# ✅ Update an event (creator or admin)
+# Update an event (creator or admin)
 @events_bp.route("/<int:event_id>", methods=["PUT"])
 @jwt_required()
 def update_existing_event(event_id):
@@ -114,7 +114,7 @@ def update_existing_event(event_id):
     }), 200
 
 
-# ✅ Delete event (creator or admin)
+#  Delete event (creator or admin)
 @events_bp.route("/<int:event_id>", methods=["DELETE"])
 @jwt_required()
 def delete_event_route(event_id):
