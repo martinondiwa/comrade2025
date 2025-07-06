@@ -17,7 +17,7 @@ import datetime
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/v1/auth")
 
 
-# ✅ Register a new user
+# Register a new user
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
@@ -45,7 +45,7 @@ def register():
     }), 201
 
 
-# ✅ Login and get JWT tokens
+# Login and get JWT tokens
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -78,7 +78,7 @@ def login():
     }), 200
 
 
-# ✅ Refresh Access Token
+# Refresh Access Token
 @auth_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh_token():
@@ -89,7 +89,7 @@ def refresh_token():
     }), 200
 
 
-# ✅ Get current logged-in user profile
+# Get current logged-in user profile
 @auth_bp.route("/me", methods=["GET"])
 @jwt_required()
 def get_profile():
