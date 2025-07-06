@@ -10,7 +10,7 @@ from app.services.notification_service import (
 notifications_bp = Blueprint("notifications", __name__, url_prefix="/api/v1/notifications")
 
 
-# ✅ Get logged-in user's notifications (paginated)
+#  Get logged-in user's notifications (paginated)
 @notifications_bp.route("/", methods=["GET"])
 @jwt_required()
 def fetch_notifications():
@@ -39,7 +39,7 @@ def fetch_notifications():
     }), 200
 
 
-# ✅ Mark a single notification as read
+# Mark a single notification as read
 @notifications_bp.route("/<int:notification_id>/read", methods=["POST"])
 @jwt_required()
 def read_single(notification_id):
@@ -50,7 +50,7 @@ def read_single(notification_id):
     return jsonify({"message": "Notification marked as read"}), 200
 
 
-# ✅ Mark all as read
+# Mark all as read
 @notifications_bp.route("/read-all", methods=["POST"])
 @jwt_required()
 def read_all():
@@ -59,7 +59,7 @@ def read_all():
     return jsonify({"message": "All notifications marked as read"}), 200
 
 
-# ✅ Delete a notification
+# Delete a notification
 @notifications_bp.route("/<int:notification_id>", methods=["DELETE"])
 @jwt_required()
 def delete_notif(notification_id):
