@@ -11,7 +11,7 @@ from app.services.post_service import get_post_by_id
 likes_bp = Blueprint("likes", __name__, url_prefix="/api/v1/likes")
 
 
-# ✅ Like a post
+# Like a post
 @likes_bp.route("/<int:post_id>/like", methods=["POST"])
 @jwt_required()
 def like(post_id):
@@ -28,7 +28,7 @@ def like(post_id):
     return jsonify({"message": f"Post {post_id} liked successfully"}), 200
 
 
-# ✅ Unlike a post
+# Unlike a post
 @likes_bp.route("/<int:post_id>/unlike", methods=["POST"])
 @jwt_required()
 def unlike(post_id):
@@ -45,7 +45,7 @@ def unlike(post_id):
     return jsonify({"message": f"Post {post_id} unliked successfully"}), 200
 
 
-# ✅ Get like count for a post
+# Get like count for a post
 @likes_bp.route("/<int:post_id>/count", methods=["GET"])
 @jwt_required()
 def like_count(post_id):
@@ -57,7 +57,7 @@ def like_count(post_id):
     return jsonify({"post_id": post_id, "likes": count}), 200
 
 
-# ✅ Check if user liked a post
+# Check if user liked a post
 @likes_bp.route("/<int:post_id>/status", methods=["GET"])
 @jwt_required()
 def like_status(post_id):
