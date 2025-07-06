@@ -15,7 +15,7 @@ from app.services.user_service import get_user_by_id
 groups_bp = Blueprint("groups", __name__, url_prefix="/api/v1/groups")
 
 
-# ✅ Create a new group
+# Create a new group
 @groups_bp.route("/", methods=["POST"])
 @jwt_required()
 def create_new_group():
@@ -40,7 +40,7 @@ def create_new_group():
     }), 201
 
 
-# ✅ Get all groups
+#  Get all groups
 @groups_bp.route("/", methods=["GET"])
 @jwt_required()
 def list_groups():
@@ -56,7 +56,7 @@ def list_groups():
     ]), 200
 
 
-# ✅ Get groups joined by current user
+# Get groups joined by current user
 @groups_bp.route("/mine", methods=["GET"])
 @jwt_required()
 def my_groups():
@@ -73,7 +73,7 @@ def my_groups():
     ]), 200
 
 
-# ✅ Join a group
+#  Join a group
 @groups_bp.route("/<int:group_id>/join", methods=["POST"])
 @jwt_required()
 def join_group_route(group_id):
@@ -84,7 +84,7 @@ def join_group_route(group_id):
     return jsonify({"message": f"Joined group {group_id} successfully"}), 200
 
 
-# ✅ Leave a group
+#  Leave a group
 @groups_bp.route("/<int:group_id>/leave", methods=["POST"])
 @jwt_required()
 def leave_group_route(group_id):
@@ -95,7 +95,7 @@ def leave_group_route(group_id):
     return jsonify({"message": f"Left group {group_id} successfully"}), 200
 
 
-# ✅ Update a group (creator or admin only)
+#  Update a group (creator or admin only)
 @groups_bp.route("/<int:group_id>", methods=["PUT"])
 @jwt_required()
 def update_group_route(group_id):
@@ -122,7 +122,7 @@ def update_group_route(group_id):
     }), 200
 
 
-# ✅ Delete a group (creator or admin only)
+#  Delete a group (creator or admin only)
 @groups_bp.route("/<int:group_id>", methods=["DELETE"])
 @jwt_required()
 def delete_group_route(group_id):
