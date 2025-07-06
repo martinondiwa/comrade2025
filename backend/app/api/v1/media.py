@@ -10,7 +10,7 @@ media_bp = Blueprint("media", __name__, url_prefix="/api/v1/media")
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi'}
 
 
-# ✅ Upload media file
+# Upload media file
 @media_bp.route("/upload", methods=["POST"])
 @jwt_required()
 def upload_media():
@@ -51,7 +51,7 @@ def upload_media():
         return jsonify({"error": "Invalid file type"}), 400
 
 
-# ✅ Get media metadata by ID
+# Get media metadata by ID
 @media_bp.route("/<int:media_id>", methods=["GET"])
 @jwt_required()
 def get_media(media_id):
