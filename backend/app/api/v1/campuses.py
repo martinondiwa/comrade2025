@@ -26,7 +26,7 @@ def admin_required(fn):
     return wrapper
 
 
-# ✅ List all campuses
+# List all campuses
 @campus_bp.route("/", methods=["GET"])
 @jwt_required()
 def list_campuses():
@@ -43,7 +43,7 @@ def list_campuses():
     return jsonify(result), 200
 
 
-# ✅ Get one campus
+#  Get one campus
 @campus_bp.route("/<int:campus_id>", methods=["GET"])
 @jwt_required()
 def get_one_campus(campus_id):
@@ -59,7 +59,7 @@ def get_one_campus(campus_id):
     }), 200
 
 
-# ✅ Create new campus (Admin only)
+# Create new campus (Admin only)
 @campus_bp.route("/", methods=["POST"])
 @admin_required
 def create_new_campus():
@@ -83,7 +83,7 @@ def create_new_campus():
     }), 201
 
 
-# ✅ Update campus (Admin only)
+# Update campus (Admin only)
 @campus_bp.route("/<int:campus_id>", methods=["PUT"])
 @admin_required
 def update_existing_campus(campus_id):
@@ -108,7 +108,7 @@ def update_existing_campus(campus_id):
     }), 200
 
 
-# ✅ Delete campus (Admin only)
+# Delete campus (Admin only)
 @campus_bp.route("/<int:campus_id>", methods=["DELETE"])
 @admin_required
 def delete_existing_campus(campus_id):
