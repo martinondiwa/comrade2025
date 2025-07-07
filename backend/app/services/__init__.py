@@ -20,17 +20,6 @@ from .event_service import EventService
 from .notification_service import NotificationService
 from .chat_service import ChatService
 
-# Optionally, create initialized instances of services (if stateless or singleton-style)
-auth_service = AuthService()
-user_service = UserService()
-post_service = PostService()
-group_service = GroupService()
-campus_service = CampusService()
-media_service = MediaService()
-event_service = EventService()
-notification_service = NotificationService()
-chat_service = ChatService()
-
 # Expose them at package level for easy imports
 __all__ = [
     "auth_service",
