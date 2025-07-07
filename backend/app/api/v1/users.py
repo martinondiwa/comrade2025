@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.services.user_service import UserService  
+
+from app.services.user_service import UserService
 
 users_bp = Blueprint("users", __name__, url_prefix="/api/v1/users")
 
@@ -8,8 +9,11 @@ users_bp = Blueprint("users", __name__, url_prefix="/api/v1/users")
 @users_bp.route("/", methods=["GET"])
 @jwt_required()
 def list_users():
-    users = UserService.search_users("")  # or get all users if you have that method
-    return jsonify({"status": "success", "data": [user.to_dict() for user in users]}), 200
+    users = UserService.search_users("")  # Can add pagination later
+    return jsonify({
+        "status": "success",
+        "data": [user.to_dict() for user in users]
+    }), 200
 
 
 @users_bp.route("/<int:user_id>", methods=["GET"])
@@ -23,7 +27,7 @@ def get_user(user_id):
 
 @users_bp.route("/", methods=["POST"])
 def register_user():
-    data = request.get_json()
+    data = request.get_json() or {}
     try:
         user = UserService.create_user(
             username=data.get("username"),
@@ -42,7 +46,7 @@ def update_user_details(user_id):
     if current_user_id != user_id:
         return jsonify({"status": "error", "message": "Unauthorized."}), 403
 
-    data = request.get_json()
+    data = request.get_json() or {}
     user = UserService.update_user_profile(user_id, **data)
     if not user:
         return jsonify({"status": "error", "message": "User not found."}), 404
@@ -67,4 +71,7 @@ def delete_user_account(user_id):
 def search_users():
     query = request.args.get("q", "")
     users = UserService.search_users(query)
-    return jsonify({"status": "success", "data": [user.to_dict() for user in users]}), 200
+    return jsonify({
+        "status": "success",
+        "data": [user.to_dict() for user in users]
+    }), 200
