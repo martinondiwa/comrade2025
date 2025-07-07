@@ -1,19 +1,16 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.services.comment_service import (
-    create_comment,
-    get_comments_by_post,
-    get_comment_by_id,
-    update_comment,
-    delete_comment
-)
+from app.services.comment_service import CommentService
 from app.services.user_service import get_user_by_id
 from app.services.post_service import get_post_by_id
 
 comments_bp = Blueprint("comments", __name__, url_prefix="/api/v1/comments")
 
+# Instantiate the service
+comment_service = CommentService()
 
-#  Create a comment on a post
+
+# Create a comment on a post
 @comments_bp.route("/<int:post_id>", methods=["POST"])
 @jwt_required()
 def post_comment(post_id):
@@ -30,7 +27,7 @@ def post_comment(post_id):
     if not post:
         return jsonify({"error": "Post not found"}), 404
 
-    comment = create_comment(post_id=post_id, user_id=user.id, text=text)
+    comment = comment_service.create_comment(post_id=post_id, user_id=user.id, text=text)
 
     return jsonify({
         "message": "Comment added successfully",
@@ -52,7 +49,7 @@ def get_comments(post_id):
     if not post:
         return jsonify({"error": "Post not found"}), 404
 
-    comments = get_comments_by_post(post_id)
+    comments = comment_service.get_comments_by_post(post_id)
 
     return jsonify([
         {
@@ -71,7 +68,7 @@ def get_comments(post_id):
 @jwt_required()
 def update_user_comment(comment_id):
     user_id = get_jwt_identity()
-    comment = get_comment_by_id(comment_id)
+    comment = comment_service.get_comment_by_id(comment_id)
 
     if not comment:
         return jsonify({"error": "Comment not found"}), 404
@@ -85,7 +82,7 @@ def update_user_comment(comment_id):
     if not text:
         return jsonify({"error": "Text is required"}), 400
 
-    updated = update_comment(comment_id, text)
+    updated = comment_service.update_comment(comment_id, text)
 
     return jsonify({
         "message": "Comment updated successfully",
@@ -103,7 +100,7 @@ def update_user_comment(comment_id):
 def delete_user_comment(comment_id):
     user_id = get_jwt_identity()
     user = get_user_by_id(user_id)
-    comment = get_comment_by_id(comment_id)
+    comment = comment_service.get_comment_by_id(comment_id)
 
     if not comment:
         return jsonify({"error": "Comment not found"}), 404
@@ -111,6 +108,6 @@ def delete_user_comment(comment_id):
     if comment.user_id != user_id and not user.is_admin:
         return jsonify({"error": "Unauthorized"}), 403
 
-    delete_comment(comment_id)
+    comment_service.delete_comment(comment_id)
 
     return jsonify({"message": f"Comment {comment_id} deleted successfully"}), 200
