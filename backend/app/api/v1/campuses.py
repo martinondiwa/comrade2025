@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from functools import wraps
 
 from app.services.campus_service import CampusService
-from app.services.user_service import get_user_by_id
+from app.services.user_service import UserService  # ✅ FIXED
 
 campus_bp = Blueprint("campuses", __name__, url_prefix="/api/v1/campuses")
 
@@ -13,7 +13,7 @@ def admin_required(fn):
     @wraps(fn)
     @jwt_required()
     def wrapper(*args, **kwargs):
-        user = get_user_by_id(get_jwt_identity())
+        user = UserService.get_user_by_id(get_jwt_identity())  # ✅ FIXED
         if not user or not user.is_admin:
             return jsonify({"message": "Admin access only"}), 403
         return fn(*args, **kwargs)
