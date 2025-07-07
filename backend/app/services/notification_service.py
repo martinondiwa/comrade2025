@@ -5,67 +5,46 @@ from app.models.user import User
 from app.workers.notification_dispatcher import enqueue_notification_dispatch
 
 
-
 class NotificationService:
     def create_notification(
-    self,
-    recipient_id: int,
-    sender_id: int,
-    message: str,
-    notif_type: str = None,
-    target_type: str = None,
-    target_id: int = None,
-    link: str = None
-) -> Notification:
-    """
-    Create a new notification and optionally dispatch it async.
+        self,
+        recipient_id: int,
+        sender_id: int,
+        message: str,
+        notif_type: str = None,
+        target_type: str = None,
+        target_id: int = None,
+        link: str = None
+    ) -> Notification:
+        """
+        Create a new notification and optionally dispatch it async.
+        """
+        notification = Notification(
+            user_id=recipient_id,
+            message=message,
+            link=link,
+            type=notif_type,
+            created_at=datetime.utcnow(),
+            is_read=False
+        )
+        db.session.add(notification)
+        db.session.commit()
 
-    Args:
-        recipient_id (int): User to notify.
-        sender_id (int): User who triggered the notification.
-        message (str): Notification message.
-        notif_type (str): e.g., 'like', 'comment'.
-        target_type (str): e.g., 'post', 'group'.
-        target_id (int): Target object ID.
-        link (str): Optional URL/app route.
+        # Asynchronously enqueue notification (e.g., email, push, websocket)
+        enqueue_notification_dispatch.delay(
+            recipient_id=recipient_id,
+            sender_id=sender_id,
+            type=notif_type,
+            message=message,
+            target_type=target_type,
+            target_id=target_id
+        )
 
-    Returns:
-        Notification: Created Notification object.
-    """
-    notification = Notification(
-        user_id=recipient_id,
-        message=message,
-        link=link,
-        type=notif_type,
-        created_at=datetime.utcnow(),
-        is_read=False
-    )
-    db.session.add(notification)
-    db.session.commit()
-
-    # Asynchronously enqueue notification (e.g., email, push, websocket)
-    enqueue_notification_dispatch(
-        recipient_id=recipient_id,
-        sender_id=sender_id,
-        type=notif_type,
-        message=message,
-        target_type=target_type,
-        target_id=target_id
-    )
-
-    return notification
+        return notification
 
     def get_user_notifications(self, user_id: int, unread_only: bool = False, limit: int = 50):
         """
         Fetch notifications for a user.
-        
-        Args:
-            user_id (int): User ID to fetch notifications for.
-            unread_only (bool): If True, fetch only unread notifications.
-            limit (int): Max number of notifications to return.
-        
-        Returns:
-            List[Notification]: List of notification objects.
         """
         query = Notification.query.filter_by(user_id=user_id)
         if unread_only:
@@ -76,16 +55,6 @@ class NotificationService:
     def mark_as_read(self, notification_id: int, user_id: int) -> Notification:
         """
         Mark a specific notification as read.
-        
-        Args:
-            notification_id (int): Notification ID.
-            user_id (int): User ID, to ensure ownership.
-        
-        Returns:
-            Notification: Updated notification object.
-        
-        Raises:
-            ValueError: If notification not found or unauthorized.
         """
         notification = Notification.query.get(notification_id)
         if not notification:
@@ -100,14 +69,6 @@ class NotificationService:
     def delete_notification(self, notification_id: int, user_id: int) -> None:
         """
         Delete a notification owned by user.
-        
-        Args:
-            notification_id (int): Notification ID.
-            user_id (int): User ID to verify ownership.
-        
-        Raises:
-            ValueError: If notification not found.
-            PermissionError: If user unauthorized.
         """
         notification = Notification.query.get(notification_id)
         if not notification:
