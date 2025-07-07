@@ -31,15 +31,4 @@ __all__ = [
     "event_service",
     "notification_service",
     "chat_service",
-
-    # Optionally export class names too, if needed for subclassing
-    "AuthService",
-    "UserService",
-    "PostService",
-    "GroupService",
-    "CampusService",
-    "MediaService",
-    "EventService",
-    "NotificationService",
-    "ChatService",
 ]
