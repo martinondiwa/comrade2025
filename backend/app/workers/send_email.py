@@ -1,5 +1,5 @@
-from backend.app.workers import celery
-from backend.app.extensions import mail
+from app.workers import celery
+from app.extensions import mail
 from flask_mail import Message
 from flask import current_app
 
