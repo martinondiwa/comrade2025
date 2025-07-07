@@ -2,7 +2,7 @@ import os
 from werkzeug.utils import secure_filename
 from app.extensions import db
 from app.models.media import Media
-from app.utils.file_storage import save_file, delete_file
+from app.utils.file_storage import save_file_to_storage, delete_file
 from datetime import datetime
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi', 'mkv'}
