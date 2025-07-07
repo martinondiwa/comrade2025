@@ -1,19 +1,9 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.services.group_service import (
-    create_group,
-    get_all_groups,
-    get_group_by_id,
-    get_user_groups,
-    update_group,
-    delete_group,
-    join_group,
-    leave_group
-)
+from app.services.group_service import GroupService
 from app.services.user_service import get_user_by_id
 
 groups_bp = Blueprint("groups", __name__, url_prefix="/api/v1/groups")
-
 
 # Create a new group
 @groups_bp.route("/", methods=["POST"])
@@ -28,7 +18,7 @@ def create_new_group():
     if not name:
         return jsonify({"error": "Group name is required"}), 400
 
-    group = create_group(name=name, description=description, creator_id=user_id)
+    group = GroupService.create_group(name=name, description=description, creator_id=user_id)
     return jsonify({
         "message": "Group created successfully",
         "group": {
@@ -40,11 +30,11 @@ def create_new_group():
     }), 201
 
 
-#  Get all groups
+# Get all groups
 @groups_bp.route("/", methods=["GET"])
 @jwt_required()
 def list_groups():
-    groups = get_all_groups()
+    groups = GroupService.get_all_groups()
     return jsonify([
         {
             "id": g.id,
@@ -61,7 +51,7 @@ def list_groups():
 @jwt_required()
 def my_groups():
     user_id = get_jwt_identity()
-    groups = get_user_groups(user_id)
+    groups = GroupService.get_user_groups(user_id)
     return jsonify([
         {
             "id": g.id,
@@ -73,35 +63,35 @@ def my_groups():
     ]), 200
 
 
-#  Join a group
+# Join a group
 @groups_bp.route("/<int:group_id>/join", methods=["POST"])
 @jwt_required()
 def join_group_route(group_id):
     user_id = get_jwt_identity()
-    joined = join_group(group_id, user_id)
+    joined = GroupService.join_group(group_id, user_id)
     if not joined:
         return jsonify({"error": "Already a member or group not found"}), 400
     return jsonify({"message": f"Joined group {group_id} successfully"}), 200
 
 
-#  Leave a group
+# Leave a group
 @groups_bp.route("/<int:group_id>/leave", methods=["POST"])
 @jwt_required()
 def leave_group_route(group_id):
     user_id = get_jwt_identity()
-    left = leave_group(group_id, user_id)
+    left = GroupService.leave_group(group_id, user_id)
     if not left:
         return jsonify({"error": "Not a member or group not found"}), 400
     return jsonify({"message": f"Left group {group_id} successfully"}), 200
 
 
-#  Update a group (creator or admin only)
+# Update a group (creator or admin only)
 @groups_bp.route("/<int:group_id>", methods=["PUT"])
 @jwt_required()
 def update_group_route(group_id):
     user_id = get_jwt_identity()
     user = get_user_by_id(user_id)
-    group = get_group_by_id(group_id)
+    group = GroupService.get_group_by_id(group_id)
 
     if not group:
         return jsonify({"error": "Group not found"}), 404
@@ -110,7 +100,7 @@ def update_group_route(group_id):
         return jsonify({"error": "Unauthorized"}), 403
 
     data = request.get_json()
-    updated = update_group(group_id, data.get("name"), data.get("description"))
+    updated = GroupService.update_group(group_id, data.get("name"), data.get("description"))
 
     return jsonify({
         "message": "Group updated successfully",
@@ -122,13 +112,13 @@ def update_group_route(group_id):
     }), 200
 
 
-#  Delete a group (creator or admin only)
+# Delete a group (creator or admin only)
 @groups_bp.route("/<int:group_id>", methods=["DELETE"])
 @jwt_required()
 def delete_group_route(group_id):
     user_id = get_jwt_identity()
     user = get_user_by_id(user_id)
-    group = get_group_by_id(group_id)
+    group = GroupService.get_group_by_id(group_id)
 
     if not group:
         return jsonify({"error": "Group not found"}), 404
@@ -136,5 +126,5 @@ def delete_group_route(group_id):
     if group.creator_id != user_id and not user.is_admin:
         return jsonify({"error": "Unauthorized"}), 403
 
-    delete_group(group_id)
+    GroupService.delete_group(group_id)
     return jsonify({"message": f"Group {group_id} deleted successfully"}), 200
