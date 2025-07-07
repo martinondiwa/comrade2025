@@ -1,8 +1,8 @@
 import os
 import subprocess
-from backend.app.workers import celery
-from backend.app.utils.file_storage import save_processed_file
-from backend.app.utils.video_optimizer import generate_thumbnail
+from app.workers import celery
+from app.utils.file_storage import save_processed_file
+from app.utils.video_optimizer import generate_thumbnail
 
 @celery.task(name="process_video")
 def process_video(video_path, output_dir=None):
