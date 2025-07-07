@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from functools import wraps
+
 from app.services.campus_service import (
     get_all_campuses,
     get_campus_by_id,
@@ -12,10 +14,8 @@ from app.services.user_service import get_user_by_id
 campus_bp = Blueprint("campuses", __name__, url_prefix="/api/v1/campuses")
 
 
-# Utility: Check if current user is admin
+# Decorator: Check if the current user is an admin
 def admin_required(fn):
-    from functools import wraps
-
     @wraps(fn)
     @jwt_required()
     def wrapper(*args, **kwargs):
@@ -26,7 +26,7 @@ def admin_required(fn):
     return wrapper
 
 
-# List all campuses
+# Route: List all campuses
 @campus_bp.route("/", methods=["GET"])
 @jwt_required()
 def list_campuses():
@@ -43,7 +43,7 @@ def list_campuses():
     return jsonify(result), 200
 
 
-#  Get one campus
+# Route: Get one campus by ID
 @campus_bp.route("/<int:campus_id>", methods=["GET"])
 @jwt_required()
 def get_one_campus(campus_id):
@@ -59,11 +59,11 @@ def get_one_campus(campus_id):
     }), 200
 
 
-# Create new campus (Admin only)
+# Route: Create a new campus (admin only)
 @campus_bp.route("/", methods=["POST"])
 @admin_required
 def create_new_campus():
-    data = request.get_json()
+    data = request.get_json() or {}
     name = data.get("name")
     location = data.get("location")
     description = data.get("description")
@@ -83,7 +83,7 @@ def create_new_campus():
     }), 201
 
 
-# Update campus (Admin only)
+# Route: Update existing campus (admin only)
 @campus_bp.route("/<int:campus_id>", methods=["PUT"])
 @admin_required
 def update_existing_campus(campus_id):
@@ -91,7 +91,7 @@ def update_existing_campus(campus_id):
     if not campus:
         return jsonify({"error": "Campus not found"}), 404
 
-    data = request.get_json()
+    data = request.get_json() or {}
     name = data.get("name", campus.name)
     location = data.get("location", campus.location)
     description = data.get("description", campus.description)
@@ -108,7 +108,7 @@ def update_existing_campus(campus_id):
     }), 200
 
 
-# Delete campus (Admin only)
+# Route: Delete a campus (admin only)
 @campus_bp.route("/<int:campus_id>", methods=["DELETE"])
 @admin_required
 def delete_existing_campus(campus_id):
