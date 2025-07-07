@@ -1,12 +1,16 @@
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.exc import IntegrityError
+
 from app.models.user import User
 from app.extensions import db
-from sqlalchemy.exc import IntegrityError
 
 
 class UserService:
     @staticmethod
     def create_user(username, email, password, **extra_fields):
+        """
+        Creates a new user with hashed password.
+        """
         password_hash = generate_password_hash(password)
         user = User(
             username=username,
@@ -52,7 +56,7 @@ class UserService:
 
     @staticmethod
     def search_users(query, limit=10, offset=0):
-        search = "%{}%".format(query)
+        search = f"%{query}%"
         return User.query.filter(
             (User.username.ilike(search)) | (User.email.ilike(search))
         ).limit(limit).offset(offset).all()
@@ -62,6 +66,6 @@ class UserService:
         user = User.query.get(user_id)
         if not user:
             return False
-        user.is_active = False  # Ensure 'is_active' exists in your User model
+        user.is_active = False  # Make sure `is_active` exists in your User model
         db.session.commit()
         return True
