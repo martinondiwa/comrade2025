@@ -1,6 +1,6 @@
-from backend.app.workers import celery
-from backend.app.extensions import db
-from backend.app.models.notification import Notification
+from app.workers import celery
+from app.extensions import db
+from app.models.notification import Notification
 from datetime import datetime
 
 @celery.task(name="dispatch_notification")
