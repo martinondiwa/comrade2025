@@ -4,7 +4,8 @@ from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 
 class CampusService:
-    def create_campus(self, name: str, location: str, description: str = "") -> dict:
+    @staticmethod
+    def create_campus(name: str, location: str, description: str = "") -> dict:
         """
         Create a new university campus.
         """
@@ -27,7 +28,8 @@ class CampusService:
             "campus_id": campus.id
         }
 
-    def get_all_campuses(self) -> list:
+    @staticmethod
+    def get_all_campuses() -> list:
         """
         Retrieve all campuses.
         """
@@ -42,7 +44,8 @@ class CampusService:
             for campus in campuses
         ]
 
-    def get_campus_by_id(self, campus_id: int) -> dict:
+    @staticmethod
+    def get_campus_by_id(campus_id: int) -> dict:
         """
         Retrieve a campus by its ID.
         """
@@ -57,7 +60,8 @@ class CampusService:
             "description": campus.description,
         }
 
-    def update_campus(self, campus_id: int, name: str = None, location: str = None, description: str = None) -> dict:
+    @staticmethod
+    def update_campus(campus_id: int, name: str = None, location: str = None, description: str = None) -> dict:
         """
         Update campus details (admin feature).
         """
@@ -79,7 +83,8 @@ class CampusService:
             "campus_id": campus.id
         }
 
-    def delete_campus(self, campus_id: int) -> dict:
+    @staticmethod
+    def delete_campus(campus_id: int) -> dict:
         """
         Delete a campus (admin only).
         """
