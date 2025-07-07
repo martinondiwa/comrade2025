@@ -17,13 +17,13 @@ class Campus(db.Model):
     events = db.relationship('Event', backref='campus', lazy=True)
 
     def __repr__(self):
-        return f\"<Campus {self.name} - {self.university}>\"
+        return f"<Campus {self.name} - {self.university}>"
 
     def to_dict(self):
         return {
-            \"id\": self.id,
-            \"name\": self.name,
-            \"university\": self.university,
-            \"location\": self.location,
-            \"created_at\": self.created_at.isoformat()
+            "id": self.id,
+            "name": self.name,
+            "university": self.university,
+            "location": self.location,
+            "created_at": self.created_at.isoformat()
         }
