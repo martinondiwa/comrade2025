@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.services.user_service import UserService  # ✅ Correct import
+from app.services.user_service import UserService  
 
 users_bp = Blueprint("users", __name__, url_prefix="/api/v1/users")
 
