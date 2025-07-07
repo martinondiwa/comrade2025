@@ -66,6 +66,6 @@ class UserService:
         user = User.query.get(user_id)
         if not user:
             return False
-        user.is_active = False  # Make sure `is_active` exists in your User model
+        user.is_active = False  # Ensure your User model has this field
         db.session.commit()
         return True
