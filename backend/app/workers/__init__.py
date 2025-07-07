@@ -1,21 +1,19 @@
 from celery import Celery
-from app import create_app
-from backend.app.config.development import DevelopmentConfig  # Adjust as per your env
+import os
 
-celery = Celery(
-    __name__,
-    broker=DevelopmentConfig.CELERY_BROKER_URL,
-    backend=DevelopmentConfig.CELERY_RESULT_BACKEND
-)
+celery = Celery(__name__)
 
 def init_celery(app=None):
     """
-    Initialize Celery with Flask app context.
+    Initializes Celery with Flask context.
     """
-    app = app or create_app(DevelopmentConfig)
+    if app is None:
+        from app import create_app  # 🔁 Move inside the function to delay import
+        from app.config.development import DevelopmentConfig  # Adjust as needed
+        app = create_app(DevelopmentConfig)
+
     celery.conf.update(app.config)
 
-    # Flask context wrapped around each task
     class ContextTask(celery.Task):
         def __call__(self, *args, **kwargs):
             with app.app_context():
