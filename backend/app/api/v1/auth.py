@@ -6,11 +6,7 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity
 )
-from app.services.user_service import (
-    create_user,
-    get_user_by_email,
-    get_user_by_id
-)
+from app.services.user_service import UserService
 from app.extensions import db
 import datetime
 
@@ -28,12 +24,14 @@ def register():
     if not all([username, email, password]):
         return jsonify({"error": "Missing required fields"}), 400
 
-    existing_user = get_user_by_email(email)
+    existing_user = UserService.get_user_by_email(email)
     if existing_user:
         return jsonify({"error": "User with this email already exists"}), 409
 
-    hashed_password = generate_password_hash(password)
-    user = create_user(username=username, email=email, password=hashed_password)
+    try:
+        user = UserService.create_user(username=username, email=email, password=password)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
     return jsonify({
         "message": "User registered successfully",
@@ -55,8 +53,8 @@ def login():
     if not email or not password:
         return jsonify({"error": "Missing email or password"}), 400
 
-    user = get_user_by_email(email)
-    if not user or not check_password_hash(user.password, password):
+    user = UserService.get_user_by_email(email)
+    if not user or not UserService.verify_password(user, password):
         return jsonify({"error": "Invalid credentials"}), 401
 
     if not user.is_active:
@@ -94,7 +92,7 @@ def refresh_token():
 @jwt_required()
 def get_profile():
     user_id = get_jwt_identity()
-    user = get_user_by_id(user_id)
+    user = UserService.get_user_by_id(user_id)
 
     if not user:
         return jsonify({"error": "User not found"}), 404
