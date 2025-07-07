@@ -14,14 +14,6 @@ def dispatch_notification(
 ):
     """
     Asynchronously creates and saves a notification.
-
-    Args:
-        recipient_id (int): User to notify
-        sender_id (int): User who triggered the notification
-        type (str): Notification type e.g., 'like', 'comment', 'follow'
-        message (str): Human-readable message
-        target_type (str, optional): Object type e.g., 'post', 'group'
-        target_id (int, optional): ID of the object
     """
     try:
         notification = Notification(
