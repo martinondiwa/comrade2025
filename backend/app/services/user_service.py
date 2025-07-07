@@ -69,3 +69,8 @@ class UserService:
         user.is_active = False  # Ensure your User model has this field
         db.session.commit()
         return True
+
+
+# --- ADD THIS AT THE BOTTOM ---
+def get_user_by_id(user_id):
+    return UserService.get_user_by_id(user_id)
