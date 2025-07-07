@@ -33,3 +33,24 @@ def dispatch_notification(
     except Exception as e:
         db.session.rollback()
         print(f"[❌] Failed to dispatch notification: {str(e)}")
+
+
+def enqueue_notification_dispatch(
+    recipient_id: int,
+    sender_id: int,
+    type: str,
+    message: str,
+    target_type: str = None,
+    target_id: int = None
+):
+    """
+    Helper function to enqueue the Celery notification task.
+    """
+    dispatch_notification.delay(
+        recipient_id=recipient_id,
+        sender_id=sender_id,
+        type=type,
+        message=message,
+        target_type=target_type,
+        target_id=target_id
+    )
