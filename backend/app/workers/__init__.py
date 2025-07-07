@@ -1,5 +1,5 @@
 from celery import Celery
-from backend.app import create_app
+from app import create_app
 from backend.app.config.development import DevelopmentConfig  # Adjust as per your env
 
 celery = Celery(
