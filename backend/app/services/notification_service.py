@@ -7,34 +7,53 @@ from app.workers.notification_dispatcher import enqueue_notification_dispatch
 
 
 class NotificationService:
-    def create_notification(self, user_id: int, message: str, link: str = None, notif_type: str = None) -> Notification:
-        """
-        Create a new notification for a user.
-        
-        Args:
-            user_id (int): The ID of the user to notify.
-            message (str): Notification message/content.
-            link (str, optional): URL or app route linked to notification.
-            notif_type (str, optional): Type/category of notification (e.g., "like", "comment").
-        
-        Returns:
-            Notification: The created Notification object.
-        """
-        notification = Notification(
-            user_id=user_id,
-            message=message,
-            link=link,
-            type=notif_type,
-            created_at=datetime.utcnow(),
-            is_read=False
-        )
-        db.session.add(notification)
-        db.session.commit()
+    def create_notification(
+    self,
+    recipient_id: int,
+    sender_id: int,
+    message: str,
+    notif_type: str = None,
+    target_type: str = None,
+    target_id: int = None,
+    link: str = None
+) -> Notification:
+    """
+    Create a new notification and optionally dispatch it async.
 
-        # Optionally enqueue async dispatch (email, push, websocket)
-        enqueue_notification_dispatch(notification.id)
+    Args:
+        recipient_id (int): User to notify.
+        sender_id (int): User who triggered the notification.
+        message (str): Notification message.
+        notif_type (str): e.g., 'like', 'comment'.
+        target_type (str): e.g., 'post', 'group'.
+        target_id (int): Target object ID.
+        link (str): Optional URL/app route.
 
-        return notification
+    Returns:
+        Notification: Created Notification object.
+    """
+    notification = Notification(
+        user_id=recipient_id,
+        message=message,
+        link=link,
+        type=notif_type,
+        created_at=datetime.utcnow(),
+        is_read=False
+    )
+    db.session.add(notification)
+    db.session.commit()
+
+    # Asynchronously enqueue notification (e.g., email, push, websocket)
+    enqueue_notification_dispatch(
+        recipient_id=recipient_id,
+        sender_id=sender_id,
+        type=notif_type,
+        message=message,
+        target_type=target_type,
+        target_id=target_id
+    )
+
+    return notification
 
     def get_user_notifications(self, user_id: int, unread_only: bool = False, limit: int = 50):
         """
