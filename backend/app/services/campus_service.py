@@ -3,7 +3,6 @@ from app.models.campus import Campus
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 
-
 class CampusService:
     def create_campus(self, name: str, location: str, description: str = "") -> dict:
         """
