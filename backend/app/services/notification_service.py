@@ -4,6 +4,8 @@ from app.models.notification import Notification
 from app.models.user import User
 from app.workers.notification_dispatcher import enqueue_notification_dispatch
 
+
+
 class NotificationService:
     def create_notification(self, user_id: int, message: str, link: str = None, notif_type: str = None) -> Notification:
         """
