@@ -5,6 +5,9 @@ from app.models.user import User
 from sqlalchemy import or_, and_
 
 def send_message(sender_id: int, recipient_id: int, content: str) -> dict:
+    """
+    Send a message from one user to another.
+    """
     sender = User.query.get(sender_id)
     recipient = User.query.get(recipient_id)
 
@@ -29,6 +32,9 @@ def send_message(sender_id: int, recipient_id: int, content: str) -> dict:
     }
 
 def get_conversation(user1_id: int, user2_id: int, limit: int = 50, offset: int = 0) -> list:
+    """
+    Fetch recent messages between two users, ordered chronologically.
+    """
     messages = ChatMessage.query.filter(
         or_(
             and_(ChatMessage.sender_id == user1_id, ChatMessage.recipient_id == user2_id),
@@ -46,10 +52,13 @@ def get_conversation(user1_id: int, user2_id: int, limit: int = 50, offset: int 
             "timestamp": msg.timestamp.isoformat(),
             "is_read": msg.is_read
         }
-        for msg in reversed(messages)
+        for msg in reversed(messages)  # Return messages in chronological order
     ]
 
 def mark_as_read(message_id: int, reader_id: int) -> dict:
+    """
+    Mark a specific message as read by the recipient.
+    """
     message = ChatMessage.query.get(message_id)
     if not message:
         raise ValueError("Message not found.")
@@ -66,6 +75,9 @@ def mark_as_read(message_id: int, reader_id: int) -> dict:
     }
 
 def delete_message(message_id: int, requester_id: int) -> dict:
+    """
+    Delete a message (only allowed by the sender).
+    """
     message = ChatMessage.query.get(message_id)
     if not message:
         raise ValueError("Message not found.")
