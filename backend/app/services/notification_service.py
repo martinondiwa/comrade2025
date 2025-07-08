@@ -77,3 +77,21 @@ class NotificationService:
             raise PermissionError("Unauthorized action.")
         db.session.delete(notification)
         db.session.commit()
+
+
+# Create a single instance for module-level usage
+notification_service = NotificationService()
+
+# Convenience module-level functions to call on the instance
+
+def create_notification(*args, **kwargs):
+    return notification_service.create_notification(*args, **kwargs)
+
+def get_user_notifications(*args, **kwargs):
+    return notification_service.get_user_notifications(*args, **kwargs)
+
+def mark_as_read(*args, **kwargs):
+    return notification_service.mark_as_read(*args, **kwargs)
+
+def delete_notification(*args, **kwargs):
+    return notification_service.delete_notification(*args, **kwargs)
