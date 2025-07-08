@@ -6,9 +6,9 @@ from sqlalchemy.exc import IntegrityError
 
 
 class EventService:
-    def create_event(self, title: str, description: str, location: str, start_time: datetime, end_time: datetime, created_by: int, campus_id: int = None, group_id: int = None) -> dict:
+    def create_event(self, title: str, description: str, location: str, start_time: datetime, end_time: datetime, created_by: int, campus_id: int = None, group_id: int = None) -> Event:
         """
-        Create a new event.
+        Create a new event and return the Event object.
         """
         creator = User.query.get(created_by)
         if not creator:
@@ -29,14 +29,11 @@ class EventService:
         db.session.add(event)
         db.session.commit()
 
-        return {
-            "message": "Event created successfully",
-            "event_id": event.id
-        }
+        return event  # Return ORM instance
 
     def get_all_events(self, campus_id=None, group_id=None) -> list:
         """
-        Retrieve events optionally filtered by campus or group.
+        Retrieve events optionally filtered by campus or group, returning list of ORM Event objects.
         """
         query = Event.query
 
@@ -46,45 +43,20 @@ class EventService:
             query = query.filter_by(group_id=group_id)
 
         events = query.order_by(Event.start_time.asc()).all()
+        return events  # Return list of ORM instances
 
-        return [
-            {
-                "id": event.id,
-                "title": event.title,
-                "description": event.description,
-                "location": event.location,
-                "start_time": event.start_time.isoformat(),
-                "end_time": event.end_time.isoformat(),
-                "campus_id": event.campus_id,
-                "group_id": event.group_id,
-                "created_by": event.created_by
-            }
-            for event in events
-        ]
-
-    def get_event_by_id(self, event_id: int) -> dict:
+    def get_event_by_id(self, event_id: int) -> Event:
         """
-        Get details of a specific event.
+        Get Event object by id.
         """
         event = Event.query.get(event_id)
         if not event:
             raise ValueError("Event not found")
+        return event  # Return ORM instance
 
-        return {
-            "id": event.id,
-            "title": event.title,
-            "description": event.description,
-            "location": event.location,
-            "start_time": event.start_time.isoformat(),
-            "end_time": event.end_time.isoformat(),
-            "campus_id": event.campus_id,
-            "group_id": event.group_id,
-            "created_by": event.created_by
-        }
-
-    def update_event(self, event_id: int, user_id: int, **kwargs) -> dict:
+    def update_event(self, event_id: int, user_id: int, **kwargs) -> Event:
         """
-        Update event details — only the creator can update.
+        Update event details — only the creator can update. Returns updated Event object.
         """
         event = Event.query.get(event_id)
         if not event:
@@ -97,13 +69,9 @@ class EventService:
                 setattr(event, key, kwargs[key])
 
         db.session.commit()
+        return event  # Return updated ORM instance
 
-        return {
-            "message": "Event updated successfully",
-            "event_id": event.id
-        }
-
-    def delete_event(self, event_id: int, user_id: int) -> dict:
+    def delete_event(self, event_id: int, user_id: int) -> None:
         """
         Delete an event — only the creator can delete.
         """
@@ -115,7 +83,3 @@ class EventService:
 
         db.session.delete(event)
         db.session.commit()
-
-        return {
-            "message": "Event deleted successfully"
-        }
