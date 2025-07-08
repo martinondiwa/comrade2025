@@ -9,7 +9,7 @@ Each service is structured to encapsulate business rules and logic, keeping
 routes (API) and models clean and maintainable.
 """
 
-# Import individual service modules for easy access
+# Import individual service classes
 from .auth_service import AuthService
 from .user_service import UserService
 from .post_service import PostService
@@ -20,15 +20,14 @@ from .event_service import EventService
 from .notification_service import NotificationService
 from .chat_service import ChatService
 
-# Expose them at package level for easy imports
 __all__ = [
-    "auth_service",
-    "user_service",
-    "post_service",
-    "group_service",
-    "campus_service",
-    "media_service",
-    "event_service",
-    "notification_service",
-    "chat_service",
+    "AuthService",
+    "UserService",
+    "PostService",
+    "GroupService",
+    "CampusService",
+    "MediaService",
+    "EventService",
+    "NotificationService",
+    "ChatService",
 ]
