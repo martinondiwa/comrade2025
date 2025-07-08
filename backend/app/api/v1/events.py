@@ -1,22 +1,19 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.services.event_service import (
-    create_event,
-    get_all_events,
-    get_event_by_id,
-    update_event,
-    delete_event
-)
+from app.services.event_service import EventService
 from app.services.user_service import get_user_by_id
 
 events_bp = Blueprint("events", __name__, url_prefix="/api/v1/events")
 
+# Instantiate the service once
+event_service = EventService()
 
-#  Get all events
+
+# Get all events
 @events_bp.route("/", methods=["GET"])
 @jwt_required()
 def list_events():
-    events = get_all_events()
+    events = event_service.get_all_events()
     return jsonify([
         {
             "id": e.id,
@@ -35,7 +32,7 @@ def list_events():
 @events_bp.route("/<int:event_id>", methods=["GET"])
 @jwt_required()
 def get_event(event_id):
-    event = get_event_by_id(event_id)
+    event = event_service.get_event_by_id(event_id)
     if not event:
         return jsonify({"error": "Event not found"}), 404
 
@@ -50,7 +47,7 @@ def get_event(event_id):
     }), 200
 
 
-#  Create a new event
+# Create a new event
 @events_bp.route("/", methods=["POST"])
 @jwt_required()
 def create_new_event():
@@ -65,7 +62,7 @@ def create_new_event():
     if not all([title, location, event_date]):
         return jsonify({"error": "Title, location, and event date are required"}), 400
 
-    event = create_event(user_id, title, description, location, event_date)
+    event = event_service.create_event(user_id, title, description, location, event_date)
     return jsonify({
         "message": "Event created successfully",
         "event": {
@@ -85,7 +82,7 @@ def create_new_event():
 def update_existing_event(event_id):
     user_id = get_jwt_identity()
     user = get_user_by_id(user_id)
-    event = get_event_by_id(event_id)
+    event = event_service.get_event_by_id(event_id)
 
     if not event:
         return jsonify({"error": "Event not found"}), 404
@@ -95,7 +92,7 @@ def update_existing_event(event_id):
 
     data = request.get_json()
 
-    updated_event = update_event(
+    updated_event = event_service.update_event(
         event_id,
         title=data.get("title", event.title),
         description=data.get("description", event.description),
@@ -114,13 +111,13 @@ def update_existing_event(event_id):
     }), 200
 
 
-#  Delete event (creator or admin)
+# Delete event (creator or admin)
 @events_bp.route("/<int:event_id>", methods=["DELETE"])
 @jwt_required()
 def delete_event_route(event_id):
     user_id = get_jwt_identity()
     user = get_user_by_id(user_id)
-    event = get_event_by_id(event_id)
+    event = event_service.get_event_by_id(event_id)
 
     if not event:
         return jsonify({"error": "Event not found"}), 404
@@ -128,5 +125,5 @@ def delete_event_route(event_id):
     if event.user_id != user_id and not user.is_admin:
         return jsonify({"error": "Unauthorized"}), 403
 
-    delete_event(event_id)
+    event_service.delete_event(event_id)
     return jsonify({"message": f"Event {event_id} deleted successfully"}), 200
