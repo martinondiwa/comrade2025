@@ -96,10 +96,11 @@ def mark_as_read(*args, **kwargs):
 def delete_notification(*args, **kwargs):
     return notification_service.delete_notification(*args, **kwargs)
 
-#  Add the missing standalone function
+# Standalone utility functions
+
 def mark_notification_as_read(notification_id: int):
     """
-    Standalone utility to mark notification as read — used for importing directly.
+    Mark a single notification as read.
     """
     notification = Notification.query.get(notification_id)
     if notification:
@@ -107,3 +108,16 @@ def mark_notification_as_read(notification_id: int):
         db.session.commit()
         return True
     return False
+
+def mark_all_notifications_as_read(user_id: int) -> int:
+    """
+    Mark all unread notifications for the user as read.
+    Returns the number of updated records.
+    """
+    notifications = Notification.query.filter_by(user_id=user_id, is_read=False).all()
+    if not notifications:
+        return 0
+    for notif in notifications:
+        notif.is_read = True
+    db.session.commit()
+    return len(notifications)
