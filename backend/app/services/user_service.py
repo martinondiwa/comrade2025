@@ -66,7 +66,7 @@ class UserService:
         user = User.query.get(user_id)
         if not user:
             return False
-        user.is_active = False  # Ensure your User model has this field
+        user.is_active = False  # Make sure User model has this field
         db.session.commit()
         return True
 
@@ -76,6 +76,18 @@ class UserService:
         Return all users in the system.
         """
         return User.query.all()
+
+
+def delete_user(user_id):
+    """
+    Permanently deletes a user from the database.
+    """
+    user = User.query.get(user_id)
+    if not user:
+        return False
+    db.session.delete(user)
+    db.session.commit()
+    return True
 
 
 # --- Export convenience methods ---
