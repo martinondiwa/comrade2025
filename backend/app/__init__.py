@@ -1,7 +1,9 @@
 from flask import Flask
 from .extensions import db, jwt, migrate
 from .config import development
-from .api.v1 import auth, users, campuses, posts, comments, likes, media, groups, events, notifications
+
+# Import the wrapper blueprint that includes all v1 modules
+from app.api.v1 import v1 as api_v1_blueprint
 
 def create_app(config_class=development.Config):
     app = Flask(__name__)
@@ -12,17 +14,7 @@ def create_app(config_class=development.Config):
     jwt.init_app(app)
     migrate.init_app(app, db)
 
-    # Register blueprints (API modules)
-    app.register_blueprint(auth.bp, url_prefix='/api/v1/auth')
-    app.register_blueprint(users.bp, url_prefix='/api/v1/users')
-    app.register_blueprint(campuses.bp, url_prefix='/api/v1/campuses')
-    app.register_blueprint(posts.bp, url_prefix='/api/v1/posts')
-    app.register_blueprint(comments.bp, url_prefix='/api/v1/comments')
-    app.register_blueprint(likes.bp, url_prefix='/api/v1/likes')
-    app.register_blueprint(media.bp, url_prefix='/api/v1/media')
-    app.register_blueprint(groups.bp, url_prefix='/api/v1/groups')
-    app.register_blueprint(events.bp, url_prefix='/api/v1/events')
-    app.register_blueprint(notifications.bp, url_prefix='/api/v1/notifications')
+    # Register all API v1 blueprints at once
+    app.register_blueprint(api_v1_blueprint, url_prefix='/api/v1')
 
     return app
-
