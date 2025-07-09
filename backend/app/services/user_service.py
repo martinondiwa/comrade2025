@@ -70,7 +70,18 @@ class UserService:
         db.session.commit()
         return True
 
+    @staticmethod
+    def get_all_users():
+        """
+        Return all users in the system.
+        """
+        return User.query.all()
 
-# --- ADD THIS AT THE BOTTOM ---
+
+# --- Export convenience methods ---
+
 def get_user_by_id(user_id):
     return UserService.get_user_by_id(user_id)
+
+def get_all_users():
+    return UserService.get_all_users()
