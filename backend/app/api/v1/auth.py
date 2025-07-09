@@ -1,33 +1,104 @@
-from flask import Blueprint
-
-v1 = Blueprint('v1', __name__)
-
-# Import your api v1 modules here
-from . import (
-    auth,
-    users,
-    campuses,
-    posts,
-    comments,
-    likes,
-    media,
-    groups,
-    chat,
-    events,
-    notifications,
-    admin
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    get_jwt_identity
 )
+from app.services.user_service import UserService
+import datetime
 
-# Register blueprints with the v1 blueprint
-v1.register_blueprint(auth.auth_bp)         # from auth.py, blueprint variable: auth_bp
-v1.register_blueprint(users.users_bp)       # from users.py, blueprint variable: users_bp
-v1.register_blueprint(campuses.campuses_bp) # from campuses.py, blueprint variable: campuses_bp
-v1.register_blueprint(posts.posts_bp)       # from posts.py, blueprint variable: posts_bp
-v1.register_blueprint(comments.comments_bp) # from comments.py, blueprint variable: comments_bp
-v1.register_blueprint(likes.likes_bp)       # from likes.py, blueprint variable: likes_bp
-v1.register_blueprint(media.media_bp)       # from media.py, blueprint variable: media_bp
-v1.register_blueprint(groups.groups_bp)     # from groups.py, blueprint variable: groups_bp
-v1.register_blueprint(chat.chat_bp)         # from chat.py, blueprint variable: chat_bp
-v1.register_blueprint(events.events_bp)     # from events.py, blueprint variable: events_bp
-v1.register_blueprint(notifications.notifications_bp) # from notifications.py, blueprint variable: notifications_bp
-v1.register_blueprint(admin.admin_bp)       # from admin.py, blueprint variable: admin_bp
+auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+
+# Register a new user
+@auth_bp.route("/register", methods=["POST"])
+def register():
+    data = request.get_json()
+    username = data.get("username")
+    email = data.get("email")
+    password = data.get("password")
+
+    if not all([username, email, password]):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    existing_user = UserService.get_user_by_email(email)
+    if existing_user:
+        return jsonify({"error": "User with this email already exists"}), 409
+
+    try:
+        user = UserService.create_user(username=username, email=email, password=password)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+    return jsonify({
+        "message": "User registered successfully",
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email
+        }
+    }), 201
+
+
+# Login and get JWT tokens
+@auth_bp.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
+
+    if not email or not password:
+        return jsonify({"error": "Missing email or password"}), 400
+
+    user = UserService.get_user_by_email(email)
+    if not user or not UserService.verify_password(user, password):
+        return jsonify({"error": "Invalid credentials"}), 401
+
+    if not user.is_active:
+        return jsonify({"error": "Account is inactive. Contact admin."}), 403
+
+    access_token = create_access_token(identity=user.id, expires_delta=datetime.timedelta(hours=2))
+    refresh_token = create_refresh_token(identity=user.id)
+
+    return jsonify({
+        "message": "Login successful",
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "is_admin": user.is_admin
+        }
+    }), 200
+
+
+# Refresh Access Token
+@auth_bp.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh_token():
+    current_user_id = get_jwt_identity()
+    access_token = create_access_token(identity=current_user_id)
+    return jsonify({
+        "access_token": access_token
+    }), 200
+
+
+# Get current logged-in user profile
+@auth_bp.route("/me", methods=["GET"])
+@jwt_required()
+def get_profile():
+    user_id = get_jwt_identity()
+    user = UserService.get_user_by_id(user_id)
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify({
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+        "is_admin": user.is_admin,
+        "is_active": user.is_active
+    }), 200
