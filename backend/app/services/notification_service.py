@@ -95,3 +95,15 @@ def mark_as_read(*args, **kwargs):
 
 def delete_notification(*args, **kwargs):
     return notification_service.delete_notification(*args, **kwargs)
+
+#  Add the missing standalone function
+def mark_notification_as_read(notification_id: int):
+    """
+    Standalone utility to mark notification as read — used for importing directly.
+    """
+    notification = Notification.query.get(notification_id)
+    if notification:
+        notification.is_read = True
+        db.session.commit()
+        return True
+    return False
