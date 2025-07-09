@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from app.services.notification_service import mark_notification_as_read
 from app.services.notification_service import (
     get_user_notifications,
     mark_notification_as_read,
