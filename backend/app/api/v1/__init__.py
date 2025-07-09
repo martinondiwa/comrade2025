@@ -1,7 +1,9 @@
 from flask import Blueprint
 
+# Main API v1 Blueprint
 v1 = Blueprint('v1', __name__)
 
+# Import and register sub-blueprints
 from .auth import auth_bp
 from .users import users_bp
 from .campuses import campus_bp
@@ -15,15 +17,21 @@ from .events import events_bp
 from .notifications import notifications_bp
 from .admin import admin_bp
 
-v1.register_blueprint(auth_bp)
-v1.register_blueprint(users_bp)
-v1.register_blueprint(campus_bp)
-v1.register_blueprint(posts_bp)
-v1.register_blueprint(comments_bp)
-v1.register_blueprint(likes_bp)
-v1.register_blueprint(media_bp)
-v1.register_blueprint(groups_bp)
-v1.register_blueprint(chat_bp)
-v1.register_blueprint(events_bp)
-v1.register_blueprint(notifications_bp)
-v1.register_blueprint(admin_bp)
+# Register all blueprints to v1
+blueprints = [
+    auth_bp,
+    users_bp,
+    campus_bp,
+    posts_bp,
+    comments_bp,
+    likes_bp,
+    media_bp,
+    groups_bp,
+    chat_bp,
+    events_bp,
+    notifications_bp,
+    admin_bp,
+]
+
+for bp in blueprints:
+    v1.register_blueprint(bp)
