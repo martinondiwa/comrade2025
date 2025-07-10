@@ -17,11 +17,8 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
-    # Relationships
-    campus = db.relationship("Campus", backref=db.backref("users", lazy="dynamic"))
-
-    # Additional relationships (defined in other models):
-    # posts, comments, likes, groups, memberships, notifications, chat_messages, follows, media
+    # ✅ Fixed relationship
+    campus = db.relationship("Campus", back_populates="students")
 
     def __repr__(self):
         return f"<User {self.username} ({self.email})>"
