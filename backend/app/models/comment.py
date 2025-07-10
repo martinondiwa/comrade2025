@@ -18,8 +18,8 @@ class Comment(db.Model):
     parent_id = Column(Integer, ForeignKey('comments.id'), nullable=True)  # for threaded comments
 
     # Relationships
-    user = relationship('User', backref=backref('comments', lazy='dynamic'))
-    post = relationship('Post', backref=backref('comments', lazy='dynamic'))
+    user = db.relationship('User', back_populates='comments')
+    post = db.relationship('Post', back_populates='comments')
 
     # Replies (self-referential relationship for nested comments)
     replies = relationship('Comment',
