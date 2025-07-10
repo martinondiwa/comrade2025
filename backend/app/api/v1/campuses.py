@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+#from flask_jwt_extended import jwt_required, get_jwt_identity
 from functools import wraps
 
 from app.services.campus_service import CampusService
@@ -11,7 +11,7 @@ campus_bp = Blueprint("campuses", __name__, url_prefix="/api/v1/campuses")
 # Decorator: Check if the current user is an admin
 def admin_required(fn):
     @wraps(fn)
-    @jwt_required()
+    #@jwt_required()
     def wrapper(*args, **kwargs):
         user = UserService.get_user_by_id(get_jwt_identity())  
         if not user or not user.is_admin:
@@ -22,7 +22,7 @@ def admin_required(fn):
 
 # Route: List all campuses
 @campus_bp.route("/", methods=["GET"])
-@jwt_required()
+#@jwt_required()
 def list_campuses():
     campuses = CampusService.get_all_campuses()
     result = [
@@ -39,7 +39,7 @@ def list_campuses():
 
 # Route: Get one campus by ID
 @campus_bp.route("/<int:campus_id>", methods=["GET"])
-@jwt_required()
+#@jwt_required()
 def get_one_campus(campus_id):
     campus = CampusService.get_campus_by_id(campus_id)
     if not campus:
@@ -55,7 +55,7 @@ def get_one_campus(campus_id):
 
 # Route: Create a new campus (admin only)
 @campus_bp.route("/", methods=["POST"])
-@admin_required
+#@admin_required
 def create_new_campus():
     data = request.get_json() or {}
     name = data.get("name")
@@ -79,7 +79,7 @@ def create_new_campus():
 
 # Route: Update existing campus (admin only)
 @campus_bp.route("/<int:campus_id>", methods=["PUT"])
-@admin_required
+#@admin_required
 def update_existing_campus(campus_id):
     campus = CampusService.get_campus_by_id(campus_id)
     if not campus:
@@ -104,7 +104,7 @@ def update_existing_campus(campus_id):
 
 # Route: Delete a campus (admin only)
 @campus_bp.route("/<int:campus_id>", methods=["DELETE"])
-@admin_required
+#@admin_required
 def delete_existing_campus(campus_id):
     campus = CampusService.get_campus_by_id(campus_id)
     if not campus:
