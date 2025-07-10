@@ -17,12 +17,13 @@ class Notification(db.Model):
     recipient = db.relationship(
         "User",
         foreign_keys=[recipient_id],
-        backref=db.backref("notifications", lazy="dynamic", cascade="all, delete-orphan"),
+        back_populates="notifications"
     )
+
     sender = db.relationship(
         "User",
         foreign_keys=[sender_id],
-        backref="sent_notifications",
+        back_populates="sent_notifications"
     )
 
     def __repr__(self):
