@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+# from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.event_service import EventService
 from app.services.user_service import get_user_by_id
 
@@ -11,7 +11,7 @@ event_service = EventService()
 
 # Get all events
 @events_bp.route("/", methods=["GET"])
-@jwt_required()
+# @jwt_required()
 def list_events():
     events = event_service.get_all_events()
     return jsonify([
@@ -30,7 +30,7 @@ def list_events():
 
 # Get a specific event
 @events_bp.route("/<int:event_id>", methods=["GET"])
-@jwt_required()
+# @jwt_required()
 def get_event(event_id):
     event = event_service.get_event_by_id(event_id)
     if not event:
@@ -49,7 +49,7 @@ def get_event(event_id):
 
 # Create a new event
 @events_bp.route("/", methods=["POST"])
-@jwt_required()
+#@jwt_required()
 def create_new_event():
     user_id = get_jwt_identity()
     data = request.get_json()
@@ -78,7 +78,7 @@ def create_new_event():
 
 # Update an event (creator or admin)
 @events_bp.route("/<int:event_id>", methods=["PUT"])
-@jwt_required()
+# @jwt_required()
 def update_existing_event(event_id):
     user_id = get_jwt_identity()
     user = get_user_by_id(user_id)
@@ -113,7 +113,7 @@ def update_existing_event(event_id):
 
 # Delete event (creator or admin)
 @events_bp.route("/<int:event_id>", methods=["DELETE"])
-@jwt_required()
+# @jwt_required()
 def delete_event_route(event_id):
     user_id = get_jwt_identity()
     user = get_user_by_id(user_id)
