@@ -16,6 +16,7 @@ class Post(db.Model):
     # Relationships
     author = db.relationship("User", back_populates="posts")
     campus = db.relationship("Campus", back_populates="posts")
+    user = db.relationship("User", back_populates="posts")
     group = db.relationship("Group", back_populates="posts")
     comments = db.relationship(
         "Comment", back_populates="post", cascade="all, delete-orphan", lazy="dynamic"
