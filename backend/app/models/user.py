@@ -29,13 +29,13 @@ class User(db.Model):
     )
     sent_messages = db.relationship(
         "Message",
-        foreign_keys="[Message.sender_id]",
+        foreign_keys="Message.sender_id",
         back_populates="sender",
         lazy="dynamic"
     )
     received_messages = db.relationship(
         "Message",
-        foreign_keys="[Message.receiver_id]",
+        foreign_keys="Message.receiver_id",
         back_populates="receiver",
         lazy="dynamic"
     )
