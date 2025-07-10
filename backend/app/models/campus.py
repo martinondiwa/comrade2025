@@ -13,8 +13,8 @@ class Campus(db.Model):
 
     # Updated relationship to match User model using back_populates
     users = db.relationship('User', back_populates='campus', lazy=True)
-    posts = db.relationship('Post', backref='campus', lazy=True)
-    events = db.relationship('Event', backref='campus', lazy=True)
+    posts = db.relationship('Post', back_populates='campus', lazy=True)
+    events = db.relationship('Event', back_populates='campus', lazy=True)
 
     def __repr__(self):
         return f"<Campus {self.name} - {self.university}>"
