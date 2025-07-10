@@ -14,8 +14,8 @@ class Media(db.Model):
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
-    uploader = db.relationship("User", backref=db.backref("media_files", lazy="dynamic"))
-    post = db.relationship("Post", backref=db.backref("media", lazy="dynamic"))
+   uploader = db.relationship("User", back_populates="media_files")
+   post = db.relationship("Post", back_populates="media")
 
     def __repr__(self):
         return f"<Media {self.filename} ({self.media_type})>"
