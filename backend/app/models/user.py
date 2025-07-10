@@ -26,6 +26,7 @@ class User(db.Model):
     comments = db.relationship('Comment', back_populates='user', lazy='dynamic')
     likes = db.relationship("Like", back_populates="user", lazy="dynamic")
     posts = db.relationship("Post", back_populates="user", lazy="dynamic")
+    media_files = db.relationship("MediaFile", back_populates="user", lazy="dynamic")
     created_events = db.relationship('Event', back_populates='creator', lazy='dynamic')
 
     group_memberships = db.relationship(
