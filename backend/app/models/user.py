@@ -48,7 +48,7 @@ class User(db.Model):
 
 
 # --- Late binding of relationships to resolve circular imports ---
-from app.models.media_file import MediaFile
+from app.models.media import Media  # updated import from media.py
 from app.models.chat_message import ChatMessage
 from app.models.follow import Follow
 from app.models.group_membership import GroupMembership
@@ -57,7 +57,7 @@ from app.models.post import Post
 
 User.likes = db.relationship("Like", back_populates="user", lazy="dynamic")
 User.posts = db.relationship("Post", back_populates="user", lazy="dynamic")
-User.media_files = db.relationship("MediaFile", back_populates="user", lazy="dynamic")
+User.media_files = db.relationship("Media", back_populates="user", lazy="dynamic")
 
 User.group_memberships = db.relationship(
     "GroupMembership",
