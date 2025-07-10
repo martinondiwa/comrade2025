@@ -12,11 +12,21 @@ class Group(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
-    creator = db.relationship("User", backref=db.backref("created_groups", lazy="dynamic"))
+    creator = db.relationship("User", back_populates="created_groups")
+
     members = db.relationship(
-        "GroupMembership", back_populates="group", cascade="all, delete-orphan"
+        "GroupMembership",
+        back_populates="group",
+        cascade="all, delete-orphan",
+        lazy="dynamic"
     )
-    posts = db.relationship("Post", backref="group", lazy=True)
+
+    posts = db.relationship(
+        "Post",
+        back_populates="group",
+        cascade="all, delete-orphan",
+        lazy="dynamic"
+    )
 
     def __repr__(self):
         return f"<Group {self.name} by User {self.creator_id}>"
@@ -28,6 +38,5 @@ class Group(db.Model):
             "description": self.description,
             "creator_id": self.creator_id,
             "created_at": self.created_at.isoformat(),
-            "members_count": len(self.members),
-            # You could add more details here if needed
+            "members_count": self.members.count(),  # Better than len() with lazy="dynamic"
         }
