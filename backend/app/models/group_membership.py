@@ -12,7 +12,7 @@ class GroupMembership(db.Model):
     joined_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
-    user = db.relationship("User", backref=db.backref("group_memberships", cascade="all, delete-orphan"))
+    user = db.relationship("User", back_populates="group_memberships")
     group = db.relationship("Group", back_populates="members")
 
     __table_args__ = (
