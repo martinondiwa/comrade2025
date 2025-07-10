@@ -13,7 +13,7 @@ class ChatMessage(db.Model):
     is_read = db.Column(db.Boolean, default=False, nullable=False)
 
     # Relationships (optional, for easier joins)
-       sender = db.relationship(
+    sender = db.relationship(
         "User",
         foreign_keys=[sender_id],
         back_populates="sent_messages"
