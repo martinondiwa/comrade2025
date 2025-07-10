@@ -2,6 +2,9 @@ from app.extensions import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
+# Only needed if you're using lambda references to Message columns
+from app.models.message import Message
+
 
 class User(db.Model):
     __tablename__ = "users"
@@ -21,33 +24,38 @@ class User(db.Model):
     campus = db.relationship("Campus", back_populates="users")
     comments = db.relationship('Comment', back_populates='user', lazy='dynamic')
     created_events = db.relationship('Event', back_populates='creator', lazy='dynamic')
+
     group_memberships = db.relationship(
-        "GroupMembership",  # Corrected class name here
+        "GroupMembership",
         back_populates="user",
         cascade="all, delete-orphan",
         lazy="dynamic"
     )
+
     sent_messages = db.relationship(
         "Message",
-        foreign_keys=["Message.sender_id"],  # wrapped in list
+        foreign_keys=lambda: [Message.sender_id],
         back_populates="sender",
         lazy="dynamic"
     )
+
     received_messages = db.relationship(
         "Message",
-        foreign_keys=["Message.receiver_id"],  # wrapped in list
+        foreign_keys=lambda: [Message.receiver_id],
         back_populates="receiver",
         lazy="dynamic"
     )
+
     following = db.relationship(
-        'Follow',  # association model/table for following relations
-        foreign_keys='Follow.follower_id',
+        'Follow',
+        foreign_keys=lambda: [db.foreign('Follow.follower_id')],
         back_populates='follower',
         lazy='dynamic'
     )
+
     followers = db.relationship(
         'Follow',
-        foreign_keys='Follow.followed_id',
+        foreign_keys=lambda: [db.foreign('Follow.followed_id')],
         back_populates='followed',
         lazy='dynamic'
     )
