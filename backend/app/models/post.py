@@ -14,17 +14,17 @@ class Post(db.Model):
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
     # Relationships
-    author = db.relationship("User", backref=db.backref("posts", lazy="dynamic"))
+    author = db.relationship("User", back_populates="posts")
     campus = db.relationship("Campus", back_populates="posts")
-    group = db.relationship("Group", backref=db.backref("posts", lazy="dynamic"))
+    group = db.relationship("Group", back_populates="posts")
     comments = db.relationship(
-        "Comment", backref="post", cascade="all, delete-orphan", lazy="dynamic"
+        "Comment", back_populates="post", cascade="all, delete-orphan", lazy="dynamic"
     )
     likes = db.relationship(
-        "Like", backref="post", cascade="all, delete-orphan", lazy="dynamic"
+        "Like", back_populates="post", cascade="all, delete-orphan", lazy="dynamic"
     )
     media = db.relationship(
-        "Media", backref="post", cascade="all, delete-orphan", lazy="dynamic"
+        "Media", back_populates="post", cascade="all, delete-orphan", lazy="dynamic"
     )
 
     def __repr__(self):
