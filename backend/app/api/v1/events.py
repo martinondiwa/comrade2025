@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from datetime import datetime
 # from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.event_service import EventService
 from app.services.user_service import get_user_by_id
@@ -20,8 +21,9 @@ def list_events():
             "title": e.title,
             "description": e.description,
             "location": e.location,
-            "event_date": e.event_date.isoformat(),
-            "creator_id": e.user_id,
+            "start_time": e.start_time.isoformat(),
+            "end_time": e.end_time.isoformat(),
+            "creator_id": e.created_by,
             "created_at": e.created_at.isoformat()
         }
         for e in events
@@ -41,8 +43,9 @@ def get_event(event_id):
         "title": event.title,
         "description": event.description,
         "location": event.location,
-        "event_date": event.event_date.isoformat(),
-        "creator_id": event.user_id,
+        "start_time": event.start_time.isoformat(),
+        "end_time": event.end_time.isoformat(),
+        "creator_id": event.created_by,
         "created_at": event.created_at.isoformat()
     }), 200
 
@@ -51,18 +54,27 @@ def get_event(event_id):
 @events_bp.route("/", methods=["POST"])
 # @jwt_required()
 def create_new_event():
-    user_id = get_jwt_identity()
+    user_id = 1  # Replace with get_jwt_identity() when auth is enabled
     data = request.get_json()
 
     title = data.get("title")
     description = data.get("description")
     location = data.get("location")
-    event_date = data.get("event_date")
+    start_time = data.get("start_time")
+    end_time = data.get("end_time")
 
-    if not all([title, location, event_date]):
-        return jsonify({"error": "Title, location, and event date are required"}), 400
+    if not all([title, location, start_time, end_time]):
+        return jsonify({"error": "Title, location, start_time, and end_time are required"}), 400
 
-    event = event_service.create_event(user_id, title, description, location, event_date)
+    event = event_service.create_event(
+        title=title,
+        description=description,
+        location=location,
+        start_time=datetime.fromisoformat(start_time),
+        end_time=datetime.fromisoformat(end_time),
+        created_by=user_id
+    )
+
     return jsonify({
         "message": "Event created successfully",
         "event": {
@@ -70,8 +82,9 @@ def create_new_event():
             "title": event.title,
             "description": event.description,
             "location": event.location,
-            "event_date": event.event_date.isoformat(),
-            "creator_id": event.user_id
+            "start_time": event.start_time.isoformat(),
+            "end_time": event.end_time.isoformat(),
+            "creator_id": event.created_by
         }
     }), 201
 
@@ -80,24 +93,26 @@ def create_new_event():
 @events_bp.route("/<int:event_id>", methods=["PUT"])
 # @jwt_required()
 def update_existing_event(event_id):
-    user_id = get_jwt_identity()
+    user_id = 1  # Replace with get_jwt_identity()
     user = get_user_by_id(user_id)
     event = event_service.get_event_by_id(event_id)
 
     if not event:
         return jsonify({"error": "Event not found"}), 404
 
-    if event.user_id != user_id and not user.is_admin:
+    if event.created_by != user_id and not user.is_admin:
         return jsonify({"error": "Unauthorized"}), 403
 
     data = request.get_json()
 
     updated_event = event_service.update_event(
         event_id,
+        user_id,
         title=data.get("title", event.title),
         description=data.get("description", event.description),
         location=data.get("location", event.location),
-        event_date=data.get("event_date", event.event_date.isoformat())
+        start_time=datetime.fromisoformat(data.get("start_time", event.start_time.isoformat())),
+        end_time=datetime.fromisoformat(data.get("end_time", event.end_time.isoformat()))
     )
 
     return jsonify({
@@ -106,7 +121,8 @@ def update_existing_event(event_id):
             "id": updated_event.id,
             "title": updated_event.title,
             "location": updated_event.location,
-            "event_date": updated_event.event_date.isoformat()
+            "start_time": updated_event.start_time.isoformat(),
+            "end_time": updated_event.end_time.isoformat()
         }
     }), 200
 
@@ -115,17 +131,17 @@ def update_existing_event(event_id):
 @events_bp.route("/<int:event_id>", methods=["DELETE"])
 # @jwt_required()
 def delete_event_route(event_id):
-    user_id = get_jwt_identity()
+    user_id = 1  # Replace with get_jwt_identity()
     user = get_user_by_id(user_id)
     event = event_service.get_event_by_id(event_id)
 
     if not event:
         return jsonify({"error": "Event not found"}), 404
 
-    if event.user_id != user_id and not user.is_admin:
+    if event.created_by != user_id and not user.is_admin:
         return jsonify({"error": "Unauthorized"}), 403
 
-    event_service.delete_event(event_id)
+    event_service.delete_event(event_id, user_id)
     return jsonify({"message": f"Event {event_id} deleted successfully"}), 200
 
 
@@ -134,50 +150,54 @@ def delete_event_route(event_id):
 # ===============================
 @events_bp.route("/seed", methods=["POST"])
 def seed_events():
-    default_user_id = 1  # Replace with a valid user ID if needed
+    default_user_id = 1  # Replace with a valid user ID
 
     sample_events = [
         {
             "title": "Campus Coding Marathon",
             "description": "A 24-hour hackathon for university students.",
             "location": "ICT Hall A",
-            "event_date": "2025-08-01T10:00:00"
+            "start_time": "2025-08-01T10:00:00",
+            "end_time": "2025-08-01T18:00:00"
         },
         {
             "title": "Art & Culture Exhibition",
             "description": "Showcasing local artists, food, and music.",
             "location": "Nairobi Gallery",
-            "event_date": "2025-08-15T14:00:00"
+            "start_time": "2025-08-15T14:00:00",
+            "end_time": "2025-08-15T20:00:00"
         },
         {
             "title": "Tech Networking Night",
             "description": "Connect with startup founders and software engineers.",
             "location": "iHub, Nairobi",
-            "event_date": "2025-08-20T18:00:00"
+            "start_time": "2025-08-20T18:00:00",
+            "end_time": "2025-08-20T21:00:00"
         },
         {
             "title": "Climate Action Workshop",
             "description": "Youth-led solutions for sustainable agriculture.",
             "location": "UN Avenue Conference Room",
-            "event_date": "2025-09-05T09:00:00"
+            "start_time": "2025-09-05T09:00:00",
+            "end_time": "2025-09-05T12:00:00"
         }
     ]
 
     created_events = []
-    for event in sample_events:
+    for e in sample_events:
         created = event_service.create_event(
-            default_user_id,
-            event["title"],
-            event["description"],
-            event["location"],
-            event["event_date"]
+            title=e["title"],
+            description=e["description"],
+            location=e["location"],
+            start_time=datetime.fromisoformat(e["start_time"]),
+            end_time=datetime.fromisoformat(e["end_time"]),
+            created_by=default_user_id
         )
         created_events.append({
             "id": created.id,
             "title": created.title,
-            "description": created.description,
-            "location": created.location,
-            "event_date": created.event_date.isoformat()
+            "start_time": created.start_time.isoformat(),
+            "end_time": created.end_time.isoformat()
         })
 
     return jsonify({
