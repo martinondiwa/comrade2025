@@ -29,7 +29,7 @@ class Event(db.Model):
     campus_id = Column(Integer, ForeignKey('campuses.id'), nullable=True)
 
     # Relationships
-    creator = relationship('User', backref=backref('created_events', lazy='dynamic'))
+    creator = db.relationship('User', back_populates='created_events')
     campus = db.relationship('Campus', back_populates='events')
 
     attendees = relationship('User',
