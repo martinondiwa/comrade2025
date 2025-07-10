@@ -2,10 +2,6 @@ from app.extensions import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from app.models.chat_message import ChatMessage 
-from app.models.follow import Follow
-from app.models.group_membership import GroupMembership
-
 
 class User(db.Model):
     __tablename__ = "users"
@@ -21,48 +17,10 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
-    # Relationships
+    # Relationships (simple ones declared here)
     campus = db.relationship("Campus", back_populates="users")
-    comments = db.relationship('Comment', back_populates='user', lazy='dynamic')
-    likes = db.relationship("Like", back_populates="user", lazy="dynamic")
-    posts = db.relationship("Post", back_populates="user", lazy="dynamic")
-    media_files = db.relationship("MediaFile", back_populates="user", lazy="dynamic")
-    created_events = db.relationship('Event', back_populates='creator', lazy='dynamic')
-
-    group_memberships = db.relationship(
-        "GroupMembership",
-        back_populates="user",
-        cascade="all, delete-orphan",
-        lazy="dynamic"
-    )
-
-    sent_messages = db.relationship(
-        "ChatMessage",
-        foreign_keys=lambda: [ChatMessage.sender_id],
-        back_populates="sender",
-        lazy="dynamic"
-    )
-
-    received_messages = db.relationship(
-        "ChatMessage",
-        foreign_keys=lambda: [ChatMessage.receiver_id],
-        back_populates="receiver",
-        lazy="dynamic"
-    )
-
-    following = db.relationship(
-        "Follow",
-        foreign_keys=lambda: [Follow.follower_id],
-        back_populates="follower",
-        lazy="dynamic"
-    )
-
-    followers = db.relationship(
-        "Follow",
-        foreign_keys=lambda: [Follow.followed_id],
-        back_populates="followed",
-        lazy="dynamic"
-    )
+    comments = db.relationship("Comment", back_populates="user", lazy="dynamic")
+    created_events = db.relationship("Event", back_populates="creator", lazy="dynamic")
 
     def __repr__(self):
         return f"<User {self.username} ({self.email})>"
@@ -87,3 +45,51 @@ class User(db.Model):
         if include_email:
             data["email"] = self.email
         return data
+
+
+# --- Late binding of relationships to resolve circular imports ---
+from app.models.media_file import MediaFile
+from app.models.chat_message import ChatMessage
+from app.models.follow import Follow
+from app.models.group_membership import GroupMembership
+from app.models.like import Like
+from app.models.post import Post
+
+User.likes = db.relationship("Like", back_populates="user", lazy="dynamic")
+User.posts = db.relationship("Post", back_populates="user", lazy="dynamic")
+User.media_files = db.relationship("MediaFile", back_populates="user", lazy="dynamic")
+
+User.group_memberships = db.relationship(
+    "GroupMembership",
+    back_populates="user",
+    cascade="all, delete-orphan",
+    lazy="dynamic"
+)
+
+User.sent_messages = db.relationship(
+    "ChatMessage",
+    foreign_keys=lambda: [ChatMessage.sender_id],
+    back_populates="sender",
+    lazy="dynamic"
+)
+
+User.received_messages = db.relationship(
+    "ChatMessage",
+    foreign_keys=lambda: [ChatMessage.receiver_id],
+    back_populates="receiver",
+    lazy="dynamic"
+)
+
+User.following = db.relationship(
+    "Follow",
+    foreign_keys=lambda: [Follow.follower_id],
+    back_populates="follower",
+    lazy="dynamic"
+)
+
+User.followers = db.relationship(
+    "Follow",
+    foreign_keys=lambda: [Follow.followed_id],
+    back_populates="followed",
+    lazy="dynamic"
+)
