@@ -49,7 +49,7 @@ def get_event(event_id):
 
 # Create a new event
 @events_bp.route("/", methods=["POST"])
-#@jwt_required()
+# @jwt_required()
 def create_new_event():
     user_id = get_jwt_identity()
     data = request.get_json()
@@ -127,3 +127,60 @@ def delete_event_route(event_id):
 
     event_service.delete_event(event_id)
     return jsonify({"message": f"Event {event_id} deleted successfully"}), 200
+
+
+# ===============================
+# TEMPORARY: Add sample events
+# ===============================
+@events_bp.route("/seed", methods=["POST"])
+def seed_events():
+    default_user_id = 1  # Replace with a valid user ID if needed
+
+    sample_events = [
+        {
+            "title": "Campus Coding Marathon",
+            "description": "A 24-hour hackathon for university students.",
+            "location": "ICT Hall A",
+            "event_date": "2025-08-01T10:00:00"
+        },
+        {
+            "title": "Art & Culture Exhibition",
+            "description": "Showcasing local artists, food, and music.",
+            "location": "Nairobi Gallery",
+            "event_date": "2025-08-15T14:00:00"
+        },
+        {
+            "title": "Tech Networking Night",
+            "description": "Connect with startup founders and software engineers.",
+            "location": "iHub, Nairobi",
+            "event_date": "2025-08-20T18:00:00"
+        },
+        {
+            "title": "Climate Action Workshop",
+            "description": "Youth-led solutions for sustainable agriculture.",
+            "location": "UN Avenue Conference Room",
+            "event_date": "2025-09-05T09:00:00"
+        }
+    ]
+
+    created_events = []
+    for event in sample_events:
+        created = event_service.create_event(
+            default_user_id,
+            event["title"],
+            event["description"],
+            event["location"],
+            event["event_date"]
+        )
+        created_events.append({
+            "id": created.id,
+            "title": created.title,
+            "description": created.description,
+            "location": created.location,
+            "event_date": created.event_date.isoformat()
+        })
+
+    return jsonify({
+        "message": f"{len(created_events)} events seeded successfully",
+        "events": created_events
+    }), 201
