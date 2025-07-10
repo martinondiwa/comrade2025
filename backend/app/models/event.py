@@ -30,7 +30,7 @@ class Event(db.Model):
 
     # Relationships
     creator = relationship('User', backref=backref('created_events', lazy='dynamic'))
-    campus = relationship('Campus', backref=backref('events', lazy='dynamic'))
+    campus = db.relationship('Campus', back_populates='events')
 
     attendees = relationship('User',
                              secondary=event_attendees,
