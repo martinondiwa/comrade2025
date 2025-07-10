@@ -2,8 +2,9 @@ from app.extensions import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Only needed if you're using lambda references to Message columns
-from app.models.message import Message
+from app.models.chat_message import ChatMessage 
+from app.models.follow import Follow
+from app.models.group_membership import GroupMembership
 
 
 class User(db.Model):
@@ -33,31 +34,31 @@ class User(db.Model):
     )
 
     sent_messages = db.relationship(
-        "Message",
-        foreign_keys=lambda: [Message.sender_id],
+        "ChatMessage",
+        foreign_keys=lambda: [ChatMessage.sender_id],
         back_populates="sender",
         lazy="dynamic"
     )
 
     received_messages = db.relationship(
-        "Message",
-        foreign_keys=lambda: [Message.receiver_id],
+        "ChatMessage",
+        foreign_keys=lambda: [ChatMessage.receiver_id],
         back_populates="receiver",
         lazy="dynamic"
     )
 
     following = db.relationship(
-        'Follow',
-        foreign_keys=lambda: [db.foreign('Follow.follower_id')],
-        back_populates='follower',
-        lazy='dynamic'
+        "Follow",
+        foreign_keys=lambda: [Follow.follower_id],
+        back_populates="follower",
+        lazy="dynamic"
     )
 
     followers = db.relationship(
-        'Follow',
-        foreign_keys=lambda: [db.foreign('Follow.followed_id')],
-        back_populates='followed',
-        lazy='dynamic'
+        "Follow",
+        foreign_keys=lambda: [Follow.followed_id],
+        back_populates="followed",
+        lazy="dynamic"
     )
 
     def __repr__(self):
