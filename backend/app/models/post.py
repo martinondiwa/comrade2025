@@ -15,7 +15,7 @@ class Post(db.Model):
 
     # Relationships
     author = db.relationship("User", backref=db.backref("posts", lazy="dynamic"))
-    campus = db.relationship("Campus", backref=db.backref("posts", lazy="dynamic"))
+    campus = db.relationship("Campus", back_populates="posts")
     group = db.relationship("Group", backref=db.backref("posts", lazy="dynamic"))
     comments = db.relationship(
         "Comment", backref="post", cascade="all, delete-orphan", lazy="dynamic"
