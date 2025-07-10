@@ -22,20 +22,20 @@ class User(db.Model):
     comments = db.relationship('Comment', back_populates='user', lazy='dynamic')
     created_events = db.relationship('Event', back_populates='creator', lazy='dynamic')
     group_memberships = db.relationship(
-        "GroupMember",
+        "GroupMembership",  # Corrected class name here
         back_populates="user",
         cascade="all, delete-orphan",
         lazy="dynamic"
     )
     sent_messages = db.relationship(
         "Message",
-        foreign_keys="Message.sender_id",
+        foreign_keys=["Message.sender_id"],  # wrapped in list
         back_populates="sender",
         lazy="dynamic"
     )
     received_messages = db.relationship(
         "Message",
-        foreign_keys="Message.receiver_id",
+        foreign_keys=["Message.receiver_id"],  # wrapped in list
         back_populates="receiver",
         lazy="dynamic"
     )
