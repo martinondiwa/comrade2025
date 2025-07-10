@@ -13,15 +13,15 @@ class ChatMessage(db.Model):
     is_read = db.Column(db.Boolean, default=False, nullable=False)
 
     # Relationships (optional, for easier joins)
-    sender = db.relationship(
+       sender = db.relationship(
         "User",
         foreign_keys=[sender_id],
-        backref=db.backref("sent_messages", lazy="dynamic"),
+        back_populates="sent_messages"
     )
     receiver = db.relationship(
         "User",
         foreign_keys=[receiver_id],
-        backref=db.backref("received_messages", lazy="dynamic"),
+        back_populates="received_messages"
     )
 
     def __repr__(self):
