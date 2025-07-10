@@ -11,8 +11,8 @@ class Campus(db.Model):
     location = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationships
-    users = db.relationship('User', backref='campus', lazy=True)
+    # Updated relationship to match User model using back_populates
+    users = db.relationship('User', back_populates='campus', lazy=True)
     posts = db.relationship('Post', backref='campus', lazy=True)
     events = db.relationship('Event', backref='campus', lazy=True)
 
