@@ -11,8 +11,8 @@ class Like(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
-    user = db.relationship("User", backref=db.backref("likes", cascade="all, delete-orphan"))
-    post = db.relationship("Post", backref=db.backref("likes", cascade="all, delete-orphan"))
+    user = db.relationship("User", back_populates="likes")
+    post = db.relationship("Post", back_populates="likes")
 
     __table_args__ = (
         db.UniqueConstraint("user_id", "post_id", name="uq_user_post_like"),
