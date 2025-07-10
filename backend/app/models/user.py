@@ -20,6 +20,13 @@ class User(db.Model):
     # Fixed relationship: match "users" from Campus model
     campus = db.relationship("Campus", back_populates="users")
 
+    group_memberships = db.relationship(
+        "GroupMember",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        lazy="dynamic"
+    )
+
     def __repr__(self):
         return f"<User {self.username} ({self.email})>"
 
