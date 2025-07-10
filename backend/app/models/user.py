@@ -17,14 +17,39 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
-    # Fixed relationship: match "users" from Campus model
+    # Relationships
     campus = db.relationship("Campus", back_populates="users")
-
+    comments = db.relationship('Comment', back_populates='user', lazy='dynamic')
+    created_events = db.relationship('Event', back_populates='creator', lazy='dynamic')
     group_memberships = db.relationship(
         "GroupMember",
         back_populates="user",
         cascade="all, delete-orphan",
         lazy="dynamic"
+    )
+    sent_messages = db.relationship(
+        "Message",
+        foreign_keys="[Message.sender_id]",
+        back_populates="sender",
+        lazy="dynamic"
+    )
+    received_messages = db.relationship(
+        "Message",
+        foreign_keys="[Message.receiver_id]",
+        back_populates="receiver",
+        lazy="dynamic"
+    )
+    following = db.relationship(
+        'Follow',  # association model/table for following relations
+        foreign_keys='Follow.follower_id',
+        back_populates='follower',
+        lazy='dynamic'
+    )
+    followers = db.relationship(
+        'Follow',
+        foreign_keys='Follow.followed_id',
+        back_populates='followed',
+        lazy='dynamic'
     )
 
     def __repr__(self):
