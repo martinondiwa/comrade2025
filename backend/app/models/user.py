@@ -54,7 +54,8 @@ from app.models.follow import Follow
 from app.models.group_membership import GroupMembership
 from app.models.like import Like
 from app.models.post import Post
-from app.models.group import Group  # Make sure to import Group here
+from app.models.group import Group
+from app.models.notification import Notification  # Add Notification import
 
 
 User.likes = db.relationship("Like", back_populates="user", lazy="dynamic")
@@ -95,4 +96,22 @@ User.followers = db.relationship(
     foreign_keys=lambda: [Follow.followed_id],
     back_populates="followed",
     lazy="dynamic"
+)
+
+# **Add these relationships for notifications**
+
+User.notifications = db.relationship(
+    "Notification",
+    foreign_keys="[Notification.recipient_id]",
+    back_populates="recipient",
+    lazy="dynamic",
+    cascade="all, delete-orphan"
+)
+
+User.sent_notifications = db.relationship(
+    "Notification",
+    foreign_keys="[Notification.sender_id]",
+    back_populates="sender",
+    lazy="dynamic",
+    cascade="all, delete-orphan"
 )
