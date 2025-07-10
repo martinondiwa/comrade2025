@@ -58,6 +58,7 @@ from app.models.post import Post
 User.likes = db.relationship("Like", back_populates="user", lazy="dynamic")
 User.posts = db.relationship("Post", back_populates="user", lazy="dynamic")
 User.media_files = db.relationship("Media", back_populates="uploader", lazy="dynamic")
+created_groups = db.relationship("Group", back_populates="creator", lazy="dynamic")
 
 User.group_memberships = db.relationship(
     "GroupMembership",
