@@ -17,8 +17,8 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
-    # ✅ Fixed relationship
-    campus = db.relationship("Campus", back_populates="students")
+    # Fixed relationship: match "users" from Campus model
+    campus = db.relationship("Campus", back_populates="users")
 
     def __repr__(self):
         return f"<User {self.username} ({self.email})>"
