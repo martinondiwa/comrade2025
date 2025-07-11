@@ -27,7 +27,7 @@ def send_email(subject, recipients, body, html=None, sender=None):
             sender=sender
         )
         mail.send(msg)
-        print(f"[✅] Email sent to {recipients}")
+        print(f"[] Email sent to {recipients}")
 
     except Exception as e:
-        print(f"[❌] Failed to send email to {recipients}: {str(e)}")
+        print(f"[] Failed to send email to {recipients}: {str(e)}")
