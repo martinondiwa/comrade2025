@@ -12,7 +12,7 @@ def create_app(config_class=development.Config):
     jwt.init_app(app)
     migrate.init_app(app, db)
 
-    # Register blueprints with their correct names
+    # Register blueprints 
     app.register_blueprint(auth.auth_bp, url_prefix='/api/v1/auth')
     app.register_blueprint(users.users_bp, url_prefix='/api/v1/users')
     app.register_blueprint(campuses.campus_bp, url_prefix='/api/v1/campuses')
@@ -24,7 +24,7 @@ def create_app(config_class=development.Config):
     app.register_blueprint(events.events_bp, url_prefix='/api/v1/events')
     app.register_blueprint(notifications.notifications_bp, url_prefix='/api/v1/notifications')
 
-    # Add a simple root route
+    # Adding a simple root route
     @app.route('/')
     def index():
         return jsonify({"message": "Welcome to the Comrade API. Use /api/v1/* endpoints."})
