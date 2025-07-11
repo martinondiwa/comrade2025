@@ -28,11 +28,11 @@ def dispatch_notification(
         )
         db.session.add(notification)
         db.session.commit()
-        print(f"[✅] Notification dispatched to user {recipient_id}")
+        print(f"[] Notification dispatched to user {recipient_id}")
 
     except Exception as e:
         db.session.rollback()
-        print(f"[❌] Failed to dispatch notification: {str(e)}")
+        print(f"[] Failed to dispatch notification: {str(e)}")
 
 
 def enqueue_notification_dispatch(
